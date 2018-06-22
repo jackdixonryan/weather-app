@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://bootswatch.com/4/solar/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Weather App</a>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="text" placeholder = "Search" id="input">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="search">Search</button>
+        </form>
+    </nav>
+
+    <div class="jumbotron">
+        <h1 id="Place"></h1>
+        <div id="icon"></div>
+        <p id="weather"></p>
+    </div>
+
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
+
+    <script>
+
+    function makeFahrenheit(x) {
+        x = x - 273.15;
+        console.log(x);
+        x = (9 / 5) * x + 32;
+        x = Math.floor(x);
+        console.log(x);
+        return x;
+    }
+    
+
+
+    var direction; 
+
+    function makeDirection(degrees) {
+        if (degrees > 337.5 || degrees <= 22.5) {
+            direction = "North";
+        } else if (degrees > 22.5 && degrees <= 67.5) {
+            direction = "Northeast";
+        } else if (degrees > 67.5 && degrees <= 112.5) {
+            direction = "East";
+        } else if (degrees > 112.5 && degrees <= 157.5) {
+            direction = "Southeast";
+        } else if (degrees > 157.5 && degrees <= 202.5) {
+            direction = "South";
+        } else if (degrees > 202.5 && degrees <= 247.5) {
+            direction = "Southwest";
+        } else if (degrees > 247.5 && degrees <= 292.5) {
+            direction = "West";
+        } else {
+            direction = "Northwest";
+        }
+    }
+
+    var name = "Denver"
+
+
+    $("#search").on("click", function(event) {
+
+    event.preventDefault();
+
+    name = $("#input").val();
+
+     var queryURL = "http://api.openweathermap.org/data/2.5/weather?apikey=11bfe7f8a31e4202f6f8bc930b06bba3&q=" + name;
+
+    
+
+    $.ajax(
+        {
+        url: queryURL,
+        method: "GET"
+        }
+    ).then(function(response) {
+
+        var temperature = makeFahrenheit(response.main.temp);
+        var description = response.weather[0].description;
+
+        makeDirection(response.wind.deg);
+        console.log(direction);
+
+        var iconId = (response.weather[0].icon);
+        image = $("<img>");
+        var link = "http://openweathermap.org/img/w/" + iconId + ".png";
+        $(image).attr("src", link);
+        $("#icon").html(image);
+
+        $("#Place").text(response.name + ", " + response.sys.country);
+
+
+        $("#weather").html("<br>Current Temperature: " + temperature + "<br><br>" + description + "<br><br>Wind: " + response.wind.speed + " kph to the " + direction + "<br><br>Humidity: " + response.main.humidity + "%");
+  
+        
+    });
+});
+    </script>
+
+</body>
+</html>
